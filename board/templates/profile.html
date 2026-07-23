@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}{{ profile_user.name + '님의 프로필' if can_view else '비공개 프로필' }}{% endblock %}
+{% block content %}
+  <h1 class="board-title">
+    {% if is_owner %}내 프로필
+    {% elif can_view %}{{ profile_user.name }}님의 프로필
+    {% else %}비공개 프로필
+    {% endif %}
+  </h1>
+
+  {% if can_view %}
+    <div class="profile-card">
+      {% if profile_user.profile_image %}
+        <img
+          class="profile-card__image"
+          src="{{ url_for('profile_image', user_id=profile_user.id) }}"
+          alt="{{ profile_user.name }}님의 프로필 이미지"
+        />
+      {% else %}
+        <div class="profile-card__image profile-card__image--empty">👤</div>
+      {% endif %}
+
+      <dl class="profile-card__info">
+        <dt>아이디</dt>
+        <dd>{{ profile_user.username }}</dd>
+        <dt>이름</dt>
+        <dd>{{ profile_user.name }}</dd>
+        <dt>학교</dt>
+        <dd>{{ profile_user.school }}</dd>
+        <dt>생년월일</dt>
+        <dd>{{ profile_user.birth_date.strftime('%Y-%m-%d') if profile_user.birth_date else '-' }}</dd>
+        <dt>국적</dt>
+        <dd>{{ profile_user.nationality or '-' }}</dd>
+      </dl>
+    </div>
+  {% else %}
+    <!-- 프로필 주인이 is_profile_public을 꺼뒀고, 지금 보는 사람은 본인도 관리자도
+         아닌 경우입니다. app.py의 view_profile()에서 can_view를 계산해서 넘겨줍니다. -->
+    <div class="post-view__locked">
+      <p>🔒 비공개 프로필입니다.</p>
+    </div>
+  {% endif %}
+
+  <div class="post-form__actions">
+    {# 회원목록 버튼도 nav와 마찬가지로 관리자한테만 보여야 합니다. #}
+    {% if session.is_admin %}
+      <a href="{{ url_for('list_users') }}" class="btn btn--gray">회원목록</a>
+    {% endif %}
+    {% if is_owner %}
+      <a href="{{ url_for('edit_profile') }}" class="btn btn--point">내 정보 수정</a>
+    {% endif %}
+  </div>
+{% endblock %}

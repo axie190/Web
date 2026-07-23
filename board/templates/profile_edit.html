@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% block title %}내 정보 수정{% endblock %}
+{% block content %}
+  <h1 class="board-title">내 정보 수정</h1>
+
+  {% if error %}
+    <p class="form-error">{{ error }}</p>
+  {% endif %}
+
+  <form class="post-form" method="post" enctype="multipart/form-data" action="{{ url_for('edit_profile') }}">
+    <div class="post-form__row">
+      <label>아이디</label>
+      <input type="text" value="{{ user.username }}" disabled />
+    </div>
+
+    <div class="post-form__row">
+      <label for="name">이름</label>
+      <input type="text" id="name" name="name" maxlength="50" required value="{{ user.name }}" />
+    </div>
+
+    <div class="post-form__row">
+      <label for="school">학교</label>
+      <input type="text" id="school" name="school" maxlength="100" required value="{{ user.school }}" />
+    </div>
+
+    <div class="post-form__row">
+      <label for="birth_date">생년월일</label>
+      <input
+        type="date"
+        id="birth_date"
+        name="birth_date"
+        required
+        value="{{ user.birth_date.strftime('%Y-%m-%d') if user.birth_date else '' }}"
+      />
+    </div>
+
+    <div class="post-form__row">
+      <label for="gender">성별</label>
+      <select id="gender" name="gender">
+        <option value="" {% if not user.gender %}selected{% endif %}>선택 안 함</option>
+        <option value="남성" {% if user.gender == '남성' %}selected{% endif %}>남성</option>
+        <option value="여성" {% if user.gender == '여성' %}selected{% endif %}>여성</option>
+      </select>
+    </div>
+
+    <div class="post-form__row">
+      <label for="nationality">국적</label>
+      <input type="text" id="nationality" name="nationality" maxlength="50" required value="{{ user.nationality or '' }}" />
+    </div>
+
+    <!-- 다른 사람이 내 프로필 상세(생년월일/국적 등)를 볼 수 있는지 여기서 정합니다.
+         체크를 풀면 비공개가 되고, 본인이나 관리자만 볼 수 있게 됩니다. -->
+    <div class="post-form__row post-form__row--checkbox">
+      <label>
+        <input
+          type="checkbox"
+          name="is_profile_public"
+          value="1"
+          {% if user.is_profile_public %}checked{% endif %}
+        />
+        다른 회원이 내 프로필을 볼 수 있게 하기 (해제하면 비공개)
+      </label>
+    </div>
+
+    <div class="post-form__row">
+      <label for="password">새 비밀번호</label>
+      <input
+        type="password"
+        id="password"
+        name="password"
+        maxlength="50"
+        placeholder="바꾸지 않으려면 비워두세요"
+      />
+    </div>
+
+    {% if user.profile_image %}
+      <div class="post-form__row">
+        <label>현재 프로필 이미지</label>
+        <img
+          class="profile-card__image profile-card__image--small"
+          src="{{ url_for('profile_image', user_id=user.id) }}"
+          alt="현재 프로필 이미지"
+        />
+      </div>
+    {% endif %}
+
+    <div class="post-form__row">
+      <label for="profile_image">프로필 이미지 변경 (선택)</label>
+      <input
+        type="file"
+        id="profile_image"
+        name="profile_image"
+        accept=".png,.jpg,.jpeg,.gif,.webp,image/*"
+      />
+      <small class="post-form__hint">이미지 파일만 업로드 가능, 최대 10MB. 안 올리면 기존 이미지가 유지됩니다.</small>
+    </div>
+
+    <div class="post-form__actions">
+      <a href="{{ url_for('view_profile', user_id=user.id) }}" class="btn btn--gray">취소</a>
+      <button type="submit" class="btn btn--point">저장</button>
+    </div>
+  </form>
+{% endblock %}

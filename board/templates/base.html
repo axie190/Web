@@ -19,10 +19,24 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='css/board.css') }}" />
 </head>
 <body>
-  <!-- 게시판 로고 + 포트폴리오 메인으로 돌아가는 링크 -->
+  <!-- 게시판 로고 + 회원 메뉴 + 포트폴리오 메인으로 돌아가는 링크 -->
+  <!-- 로그인 여부는 session["user_id"]로 확인합니다. Flask가 템플릿에 session을 기본으로
+       넘겨주기 때문에 여기서 따로 view 함수마다 값을 전달하지 않아도 바로 씁니다. -->
   <nav class="board-nav">
     <a href="{{ url_for('list_posts') }}" class="board-nav__logo">TH. Board</a>
-    <a href="/" class="board-nav__back">포트폴리오로 돌아가기</a>
+    <div class="board-nav__right">
+      {% if session.user_id %}
+        <a href="{{ url_for('view_profile', user_id=session.user_id) }}" class="board-nav__link">{{ session.username }}님</a>
+        {% if session.is_admin %}
+          <a href="{{ url_for('list_users') }}" class="board-nav__link">회원목록</a>
+        {% endif %}
+        <a href="{{ url_for('logout') }}" class="board-nav__link">로그아웃</a>
+      {% else %}
+        <a href="{{ url_for('login') }}" class="board-nav__link">로그인</a>
+        <a href="{{ url_for('register') }}" class="board-nav__link">회원가입</a>
+      {% endif %}
+      <a href="/" class="board-nav__back">포트폴리오로 돌아가기</a>
+    </div>
   </nav>
 
   <main class="board-main">

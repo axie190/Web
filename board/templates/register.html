@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block title %}회원가입{% endblock %}
+{% block content %}
+  <h1 class="board-title">회원가입</h1>
+
+  {% if error %}
+    <p class="form-error">{{ error }}</p>
+  {% endif %}
+
+  <form class="post-form" method="post" enctype="multipart/form-data" action="{{ url_for('register') }}">
+    <div class="post-form__row">
+      <label for="username">아이디</label>
+      <input type="text" id="username" name="username" maxlength="50" required value="{{ username or '' }}" />
+    </div>
+
+    <div class="post-form__row">
+      <label for="password">비밀번호</label>
+      <input type="password" id="password" name="password" maxlength="50" required />
+    </div>
+
+    <div class="post-form__row">
+      <label for="password_confirm">비밀번호 확인</label>
+      <input type="password" id="password_confirm" name="password_confirm" maxlength="50" required />
+    </div>
+
+    <div class="post-form__row">
+      <label for="name">이름</label>
+      <input type="text" id="name" name="name" maxlength="50" required value="{{ name or '' }}" />
+    </div>
+
+    <div class="post-form__row">
+      <label for="school">학교</label>
+      <input type="text" id="school" name="school" maxlength="100" required value="{{ school or '' }}" />
+    </div>
+
+    <div class="post-form__row">
+      <label for="birth_date">생년월일</label>
+      <input type="date" id="birth_date" name="birth_date" required value="{{ birth_date or '' }}" />
+    </div>
+
+    <div class="post-form__row">
+      <label for="gender">성별</label>
+      <select id="gender" name="gender">
+        <option value="" {% if not gender %}selected{% endif %}>선택 안 함</option>
+        <option value="남성" {% if gender == '남성' %}selected{% endif %}>남성</option>
+        <option value="여성" {% if gender == '여성' %}selected{% endif %}>여성</option>
+      </select>
+    </div>
+
+    <div class="post-form__row">
+      <label for="nationality">국적</label>
+      <input type="text" id="nationality" name="nationality" maxlength="50" required value="{{ nationality or '' }}" />
+    </div>
+
+    <div class="post-form__row">
+      <label for="profile_image">프로필 이미지 (선택)</label>
+      <input
+        type="file"
+        id="profile_image"
+        name="profile_image"
+        accept=".png,.jpg,.jpeg,.gif,.webp,image/*"
+      />
+      <small class="post-form__hint">이미지 파일만 업로드 가능, 최대 10MB</small>
+    </div>
+
+    <div class="post-form__actions">
+      <a href="{{ url_for('list_posts') }}" class="btn btn--gray">취소</a>
+      <button type="submit" class="btn btn--point">가입하기</button>
+    </div>
+  </form>
+{% endblock %}

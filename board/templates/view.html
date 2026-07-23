@@ -3,26 +3,70 @@
 {% block content %}
   <!-- 글 상세보기. 이 페이지에 들어올 때마다 app.py에서 조회수를 1씩 올려줍니다 -->
   <article class="post-view">
-    <h1 class="post-view__title">{{ post.title }}</h1>
+    <h1 class="post-view__title">
+      {% if post.is_secret %}<span class="post-view__lock-icon" title="비밀글">🔒</span>{% endif %}
+      {{ post.title }}
+    </h1>
     <div class="post-view__meta">
-      <span>{{ post.author }}</span>
+      <span>
+        {% if post.user_id %}
+          <a href="{{ url_for('view_profile', user_id=post.user_id) }}">{{ post.author }}</a>
+        {% else %}
+          {{ post.author }}
+        {% endif %}
+      </span>
       <span>{{ post.created_at.strftime('%Y-%m-%d %H:%M') }}</span>
       <span>조회 {{ post.views }}</span>
     </div>
-    <div class="post-view__content">{{ post.content }}</div>
+
+    {% if unlocked %}
+      <div class="post-view__content">{{ post.content }}</div>
+
+      {% if attachments %}
+        <ul class="attachment-list">
+          {% for att in attachments %}
+            <li>
+              <a href="{{ url_for('download_attachment', post_id=post.id, attachment_id=att.id) }}">
+                📎 {{ att.original_filename }}
+              </a>
+              <span class="attachment-list__size">({{ (att.size_bytes / 1024) | round(1) }} KB)</span>
+            </li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+
+      <!-- 회원이 쓴 글이면(author_profile이 있으면) 프로필 이미지 + "프로필 보기" 버튼만
+           보여줍니다. 이름/학교 같은 텍스트 정보는 여기서 미리 보여주지 않고, 버튼을 눌러
+           프로필 페이지로 넘어가야만 볼 수 있게 했습니다. 비회원 글은 프로필 자체가
+           없으므로 이 영역이 나타나지 않습니다. -->
+      {% if author_profile %}
+        <div class="post-view__author-profile">
+          {% if author_profile.profile_image %}
+            <img
+              class="profile-card__image profile-card__image--small"
+              src="{{ url_for('profile_image', user_id=author_profile.id) }}"
+              alt="{{ author_profile.name }}님의 프로필 이미지"
+            />
+          {% else %}
+            <div class="profile-card__image profile-card__image--small profile-card__image--empty">👤</div>
+          {% endif %}
+          <a href="{{ url_for('view_profile', user_id=author_profile.id) }}" class="btn btn--gray">프로필 보기</a>
+        </div>
+      {% endif %}
+    {% else %}
+      <!-- 비밀글이라서 아직 비밀번호 확인이 안 된 상태입니다. 서버(view_post)가 애초에
+           content/attachments를 내용 그대로는 안 채워주므로, 여기서는 잠금 안내만 보여줍니다. -->
+      <div class="post-view__locked">
+        <p>🔒 비밀글입니다. 비밀번호를 입력하면 내용을 볼 수 있습니다.</p>
+        <button type="button" class="btn btn--point" onclick="unlockSecret()">내용 보기</button>
+      </div>
+    {% endif %}
 
     <div class="post-view__actions">
       <a href="{{ url_for('list_posts') }}" class="btn btn--gray">목록</a>
       <!-- prompt()는 브라우저 기본 창이라 입력한 비밀번호가 그대로 보여서,
            비밀번호 칸이 가려지는(●) 작은 팝업창을 직접 만들어서 대신 씁니다. -->
       <button type="button" class="btn btn--gray" onclick="goEdit()">수정</button>
-      <form
-        method="post"
-        action="{{ url_for('delete_post', post_id=post.id) }}"
-        id="deleteForm"
-      >
-        <input type="hidden" name="password" id="deletePassword" />
-      </form>
       <button type="button" class="btn btn--danger" onclick="doDelete()">삭제</button>
     </div>
   </article>
@@ -68,17 +112,42 @@
       }
     }
 
+    // 비밀번호를 서버로 한 번 보내서 맞는지 확인만 하고, 결과로 받은 주소로 이동합니다.
+    // 예전에는 비밀번호를 주소(?pw=)나 화면의 hidden 값에 넣어뒀는데, 그러면 주소창
+    // 기록이나 페이지 소스에 비밀번호가 그대로 남는다고 지적받아서 fetch로 바꿨습니다.
+    // fetch로 보내면 화면 어디에도 비밀번호가 나타나지 않습니다.
+    function verifyAndGo(pw, action) {
+      fetch("{{ url_for('verify_password', post_id=post.id) }}", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: "password=" + encodeURIComponent(pw) + "&action=" + action,
+      })
+        .then(function (res) { return res.json(); })
+        .then(function (data) {
+          if (data.ok) {
+            location.href = data.redirect;
+          } else {
+            alert(data.error);
+          }
+        });
+    }
+
     function goEdit() {
       askPassword(function (pw) {
-        location.href = "{{ url_for('edit_post', post_id=post.id) }}?pw=" + encodeURIComponent(pw);
+        verifyAndGo(pw, "edit");
       });
     }
 
     function doDelete() {
       askPassword(function (pw) {
         if (!confirm("이 글을 삭제할까요?")) return;
-        document.getElementById("deletePassword").value = pw;
-        document.getElementById("deleteForm").submit();
+        verifyAndGo(pw, "delete");
+      });
+    }
+
+    function unlockSecret() {
+      askPassword(function (pw) {
+        verifyAndGo(pw, "view");
       });
     }
   </script>

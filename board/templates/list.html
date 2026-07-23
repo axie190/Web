@@ -48,9 +48,17 @@
         <tr>
           <td class="post-table__id">{{ post.id }}</td>
           <td class="post-table__title">
-            <a href="{{ url_for('view_post', post_id=post.id) }}">{{ post.title }}</a>
+            <a href="{{ url_for('view_post', post_id=post.id) }}">
+              {% if post.is_secret %}🔒{% endif %} {{ post.title }}
+            </a>
           </td>
-          <td class="post-table__author">{{ post.author }}</td>
+          <td class="post-table__author">
+            {% if post.user_id %}
+              <a href="{{ url_for('view_profile', user_id=post.user_id) }}">{{ post.author }}</a>
+            {% else %}
+              {{ post.author }}
+            {% endif %}
+          </td>
           <td class="post-table__views">{{ post.views }}</td>
           <td class="post-table__date">{{ post.created_at.strftime('%Y-%m-%d') }}</td>
         </tr>

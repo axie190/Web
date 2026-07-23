@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}회원목록{% endblock %}
+{% block content %}
+  <h1 class="board-title">회원목록</h1>
+
+  <table class="post-table">
+    <thead>
+      <tr>
+        <th>아이디</th>
+        <th>이름</th>
+        <th>학교</th>
+        <th>관리</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for u in users %}
+        <tr>
+          <td><a href="{{ url_for('view_profile', user_id=u.id) }}">{{ u.username }}</a></td>
+          <td>{{ u.name }}</td>
+          <td>{{ u.school }}</td>
+          <td>
+            {% if u.id != session.user_id %}
+              <form
+                method="post"
+                action="{{ url_for('delete_member', user_id=u.id) }}"
+                class="post-view__delete-form"
+                onsubmit="return confirm('{{ u.username }} 회원을 삭제할까요? 이 회원이 쓴 글은 삭제되지 않고 남습니다.');"
+              >
+                <button type="submit" class="btn btn--danger">삭제</button>
+              </form>
+            {% endif %}
+          </td>
+        </tr>
+      {% else %}
+        <tr>
+          <td colspan="4" class="post-table__empty">회원이 없습니다.</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}

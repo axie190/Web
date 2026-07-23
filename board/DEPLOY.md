@@ -121,6 +121,12 @@ server {
     listen 80;
     server_name 도메인_또는_IP;
 
+    # 첨부파일이 저장되는 board/uploads/는 원래도 서빙되는 곳이 아니지만, 혹시 몰라서 방어적으로 막아둠
+    location /board/uploads/ {
+        deny all;
+        return 404;
+    }
+
     location / {
         proxy_pass http://127.0.0.1:5050;
         proxy_set_header Host $host;

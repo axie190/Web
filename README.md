@@ -44,7 +44,7 @@ open index.html   # Windows는 그냥 더블클릭
 
 3주차 과제로 추가한 게시판입니다. sqlalchemy 같은 ORM은 쓰지 않고, `pymysql`로 SQL을 직접 작성해서 실행하도록 만들었습니다.
 
-- **기능**: 게시글 CRUD(작성/조회/수정/삭제), 검색(제목/내용/전체)
+- **기능**: 게시글 CRUD(작성/조회/수정/삭제), 검색(제목/내용/전체), 비밀글(비밀번호 확인 전엔 본문 비공개), 파일 업로드/다운로드
 - **기술 스택**: Flask, pymysql, MySQL
 - **배포 주소**: https://tae-hyun.duckdns.org/board/posts (네이버클라우드플랫폼 VPS, Let's Encrypt로 HTTPS 적용)
 - **배포**: Flask(gunicorn) + MySQL + nginx로 배포, http로 접속해도 자동으로 https로 리다이렉트됩니다.
