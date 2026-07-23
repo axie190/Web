@@ -42,7 +42,7 @@ open index.html   # Windows는 그냥 더블클릭
 
 ## 게시판(Board)
 
-3주차 과제로 추가한 게시판입니다. sqlalchemy 같은 ORM은 쓰지 않고, `pymysql`로 SQL을 직접 작성해서 실행하도록 만들었습니다.
+게시판 추가 사항 입니다. sqlalchemy 같은 ORM은 쓰지 않고, `pymysql`로 SQL을 직접 작성해서 실행하도록 만들었습니다.
 
 - **기능**: 게시글 CRUD(작성/조회/수정/삭제), 검색(제목/내용/전체), 비밀글(비밀번호 확인 전엔 본문 비공개), 파일 업로드/다운로드
 - **기술 스택**: Flask, pymysql, MySQL
