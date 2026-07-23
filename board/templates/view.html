@@ -35,24 +35,26 @@
         </ul>
       {% endif %}
 
-      <!-- 회원이 쓴 글이면(author_profile이 있으면) 프로필 이미지 + "프로필 보기" 버튼만
-           보여줍니다. 이름/학교 같은 텍스트 정보는 여기서 미리 보여주지 않고, 버튼을 눌러
-           프로필 페이지로 넘어가야만 볼 수 있게 했습니다. 비회원 글은 프로필 자체가
-           없으므로 이 영역이 나타나지 않습니다. -->
-      {% if author_profile %}
-        <div class="post-view__author-profile">
-          {% if author_profile.profile_image %}
-            <img
-              class="profile-card__image profile-card__image--small"
-              src="{{ url_for('profile_image', user_id=author_profile.id) }}"
-              alt="{{ author_profile.name }}님의 프로필 이미지"
-            />
-          {% else %}
-            <div class="profile-card__image profile-card__image--small profile-card__image--empty">👤</div>
-          {% endif %}
+      <!-- 회원/비회원 글 상관없이 이 영역은 항상 보여줍니다. 회원 글이면 프로필 이미지 +
+           "프로필 보기" 버튼을, 비회원 글이면 계정이 없어 넘어갈 프로필 페이지가 없으므로
+           버튼 대신 "비회원이 작성한 글" 안내만 넣습니다. -->
+      <div class="post-view__author-profile">
+        {% if author_profile and author_profile.profile_image %}
+          <img
+            class="profile-card__image profile-card__image--small"
+            src="{{ url_for('profile_image', user_id=author_profile.id) }}"
+            alt="{{ author_profile.name }}님의 프로필 이미지"
+          />
+        {% else %}
+          <div class="profile-card__image profile-card__image--small profile-card__image--empty">👤</div>
+        {% endif %}
+
+        {% if author_profile %}
           <a href="{{ url_for('view_profile', user_id=author_profile.id) }}" class="btn btn--gray">프로필 보기</a>
-        </div>
-      {% endif %}
+        {% else %}
+          <p class="post-view__author-profile-note">비회원이 작성한 글입니다.</p>
+        {% endif %}
+      </div>
     {% else %}
       <!-- 비밀글이라서 아직 비밀번호 확인이 안 된 상태입니다. 서버(view_post)가 애초에
            content/attachments를 내용 그대로는 안 채워주므로, 여기서는 잠금 안내만 보여줍니다. -->

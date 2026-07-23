@@ -248,7 +248,8 @@ a {
   font-weight: 700;
 }
 
-/* 게시글 상세보기 맨 아래에 붙는 프로필 이미지 + "프로필 보기" 버튼 (회원이 쓴 글일 때만 나옴) */
+/* 게시글 상세보기 맨 아래에 붙는 프로필 이미지 + "프로필 보기" 버튼(회원 글) 또는
+   "비회원이 작성한 글" 안내(비회원 글). 회원/비회원 상관없이 항상 나타납니다. */
 .post-view__author-profile {
   margin-top: 2rem;
   padding-top: 1.5rem;
@@ -257,6 +258,10 @@ a {
   flex-direction: column;
   align-items: flex-start;
   gap: 1rem;
+}
+.post-view__author-profile-note {
+  color: #999;
+  font-size: 0.9rem;
 }
 
 /* 회원 프로필 */
